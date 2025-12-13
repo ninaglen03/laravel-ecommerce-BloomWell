@@ -2,6 +2,8 @@
 
 @section('title', 'Products - Admin')
 
+@section('suppress-status', true)
+
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -14,7 +16,7 @@
     </div>
 
     @if (session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
+        <div class="alert alert-success flash-alert" role="alert">{{ session('status') }}</div>
     @endif
 
     <div class="table-responsive">

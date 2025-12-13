@@ -2,6 +2,8 @@
 
 @section('title', 'Your Cart')
 
+@section('suppress-status', true)
+
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="mb-0">Shopping cart</h3>
@@ -9,7 +11,7 @@
     </div>
 
     @if (session('status'))
-        <div class="alert alert-success">{{ session('status') }}</div>
+        <div class="alert alert-success flash-alert" role="alert">{{ session('status') }}</div>
     @endif
 
     @if (session('error'))

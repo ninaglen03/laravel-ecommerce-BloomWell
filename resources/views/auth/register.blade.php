@@ -14,6 +14,7 @@
 
             <form method="POST" action="{{ url('/register') }}">
                 {{ csrf_field() }}
+                <input type="hidden" name="store_admin" value="{{ old('store_admin', request()->boolean('admin') ? 1 : 0) }}">
 
                 <div class="form-group">
                     <label for="name">Full name</label>
@@ -55,6 +56,10 @@
 
             <hr>
             <p class="text-center">Already have an account? <a href="{{ url('/login') }}">Sign in</a></p>
+            <p class="text-center text-muted mb-0">Want to manage the storefront?</p>
+            <p class="text-center">
+                <a href="{{ route('register', ['admin' => 1]) }}" class="btn btn-link p-0">Register as Store Admin</a>
+            </p>
         </div>
     </div>
 @endsection

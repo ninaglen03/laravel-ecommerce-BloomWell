@@ -20,6 +20,8 @@
     a:hover { color: var(--accent-secondary) !important; }
     .nav-link { color:#333 !important; }
     .nav-link:hover { color: var(--accent-secondary) !important; }
+    .nav-account-toggle { color:#333; font-weight:500; text-decoration:none; }
+    .nav-account-toggle:hover { color: var(--accent-secondary); text-decoration:none; }
     .hero-banner { background: linear-gradient(180deg, rgba(243,251,247,1) 0%, rgba(255,255,255,1) 100%), url('https://images.unsplash.com/photo-1556229010-aa3f7ff66a43?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat; border-bottom:1px solid #e5f3ea; }
     .hero-inner { padding:4rem 0; }
     </style>
@@ -36,14 +38,28 @@
                 <a class="nav-link" href="{{ route('shop.index') }}"><i class="bi bi-bag mr-1"></i> Shop</a>
                 <a class="nav-link" href="{{ route('cart.index') }}"><i class="bi bi-cart3 mr-1"></i> Cart</a>
                 @auth
-                    <a class="nav-link" href="{{ route('profile.show') }}"><i class="bi bi-person-circle mr-1"></i> {{ \Illuminate\Support\Str::limit(auth()->user()->name, 12) }}</a>
-                    @if (auth()->user()->is_admin)
-                        <a class="nav-link" href="{{ url('/admin/dashboard') }}"><i class="bi bi-speedometer mr-1"></i> Admin</a>
-                    @endif
-                    <form action="{{ route('logout') }}" method="POST" class="ml-3 mb-0 d-inline">
-                        @csrf
-                        <button class="btn btn-outline-dark" type="submit"><i class="bi bi-box-arrow-right mr-1"></i> Logout</button>
-                    </form>
+                    @php($user = auth()->user())
+                    <div class="dropdown ml-3">
+                        <button class="btn btn-link nav-account-toggle d-flex align-items-center p-0" type="button" id="accountMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-person-circle mr-1"></i>
+                            <span>{{ \Illuminate\Support\Str::limit($user->name, 12) }}</span>
+                            <i class="bi bi-chevron-down ml-1 small"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right shadow-sm" aria-labelledby="accountMenu">
+                            @if (! $user->is_admin)
+                                <a class="dropdown-item d-flex align-items-center" href="{{ route('dashboard') }}"><i class="bi bi-grid-1x2 mr-2"></i>Dashboard</a>
+                                <a class="dropdown-item d-flex align-items-center" href="{{ route('profile.show') }}"><i class="bi bi-person mr-2"></i>Profile</a>
+                                <a class="dropdown-item d-flex align-items-center" href="{{ route('orders.index') }}"><i class="bi bi-receipt mr-2"></i>Orders</a>
+                            @else
+                                <a class="dropdown-item d-flex align-items-center" href="{{ url('/admin/dashboard') }}"><i class="bi bi-speedometer mr-2"></i>Admin Console</a>
+                            @endif
+                            <div class="dropdown-divider"></div>
+                            <form action="{{ route('logout') }}" method="POST" class="m-0">
+                                @csrf
+                                <button class="dropdown-item d-flex align-items-center" type="submit"><i class="bi bi-box-arrow-right mr-2"></i>Sign out</button>
+                            </form>
+                        </div>
+                    </div>
                 @else
                     <a class="ml-3 text-dark" href="{{ url('/register') }}"><i class="bi bi-person-plus mr-1"></i> Create account</a>
                     <a class="btn btn-outline-dark ml-2" href="{{ url('/login') }}"><i class="bi bi-box-arrow-in-right mr-1"></i> Sign in</a>
@@ -61,8 +77,8 @@
 
     <main class="py-4">
         <div class="container">
-            @if (session('status'))
-                <div class="alert alert-info">{{ session('status') }}</div>
+            @if (! View::hasSection('suppress-status') && session('status'))
+                <div class="alert alert-success flash-alert" role="alert">{{ session('status') }}</div>
             @endif
             @yield('content')
         </div>
@@ -91,6 +107,18 @@
                     icon.classList.toggle('bi-eye');
                     icon.classList.toggle('bi-eye-slash');
                 }
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.flash-alert').forEach(function (alert) {
+                    setTimeout(function () {
+                        alert.style.transition = 'opacity 0.3s ease';
+                        alert.style.opacity = '0';
+                        setTimeout(function () {
+                            alert.remove();
+                        }, 300);
+                    }, 3000);
+                });
             });
         </script>
 </body>

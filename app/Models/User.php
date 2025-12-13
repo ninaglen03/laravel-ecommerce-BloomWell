@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Registration::class);
     }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
 }

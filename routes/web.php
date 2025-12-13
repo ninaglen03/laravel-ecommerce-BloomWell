@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-use App\Http\Controllers\RegistrationController;
-use App\Http\Controllers\AuthorizationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -16,16 +14,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
-
-// registration
-Route::get('/registrations', [RegistrationController::class, 'index'])->middleware(\App\Http\Middleware\Registration::class);
-Route::post('/registrations', [RegistrationController::class, 'store'])->middleware(\App\Http\Middleware\Registration::class);
-Route::get('/registrations/{id}', [RegistrationController::class, 'show'])->middleware(\App\Http\Middleware\Registration::class);
-
-// authorization
-Route::get('/authorizations', [AuthorizationController::class, 'index'])->middleware(\App\Http\Middleware\Authorization::class);
-Route::post('/authorizations', [AuthorizationController::class, 'store'])->middleware(\App\Http\Middleware\Authorization::class);
-Route::get('/authorizations/{id}', [AuthorizationController::class, 'show'])->middleware(\App\Http\Middleware\Authorization::class);
+use App\Http\Controllers\UserDashboardController;
 
 Route::get('/', function () {
     return view('home');
@@ -72,7 +61,7 @@ Route::post('/login', function (Request $request) {
         return redirect()->intended('/admin/dashboard');
     }
 
-    return redirect()->intended('/');
+    return redirect()->intended(route('shop.index'));
 });
 
 Route::get('/register', function () {
@@ -80,12 +69,13 @@ Route::get('/register', function () {
 })->name('register');
 
 Route::post('/register', function (Request $request) {
-    $data = $request->only(['name', 'email', 'password', 'password_confirmation']);
+    $data = $request->only(['name', 'email', 'password', 'password_confirmation', 'store_admin']);
 
     $validator = Validator::make($data, [
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|min:6|confirmed',
+        'store_admin' => 'nullable|boolean',
     ]);
 
     if ($validator->fails()) {
@@ -96,11 +86,16 @@ Route::post('/register', function (Request $request) {
         'name' => $data['name'],
         'email' => $data['email'],
         'password' => Hash::make($data['password']),
+        'is_admin' => $request->boolean('store_admin'),
     ]);
 
     Auth::login($user);
 
-    return redirect()->intended('/');
+    if ($user->is_admin) {
+        return redirect()->intended('/admin/dashboard');
+    }
+
+    return redirect()->intended(route('shop.index'));
 });
 
 Route::post('/logout', function (Request $request) {
@@ -111,7 +106,9 @@ Route::post('/logout', function (Request $request) {
     return redirect('/');
 })->name('logout');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'customer'])->group(function () {
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -123,7 +120,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', [AdminController::class, 'index']);
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::resource('/admin/products', AdminProductController::class)->names('admin.products');
     Route::resource('/admin/orders', AdminOrderController::class)->only(['index', 'show', 'update'])->names('admin.orders');
 });
