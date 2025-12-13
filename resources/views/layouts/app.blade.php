@@ -33,12 +33,21 @@
                 BloomWell<span class="wellness-accent">+</span>
             </a>
             <nav class="d-flex align-items-center">
-                <a class="nav-link" href="#"><i class="bi bi-bag mr-1"></i> Shop</a>
-                <a class="nav-link" href="#"><i class="bi bi-capsule-pill mr-1"></i> Supplements</a>
-                <a class="nav-link" href="#"><i class="bi bi-droplet-half mr-1"></i> Self-Care</a>
-                <a class="nav-link" href="#"><i class="bi bi-cart3 mr-1"></i> Cart</a>
-                <a class="ml-3 text-dark" href="{{ url('/register') }}"><i class="bi bi-person-plus mr-1"></i> Create account</a>
-                <a class="btn btn-outline-dark ml-2" href="{{ url('/login') }}"><i class="bi bi-box-arrow-in-right mr-1"></i> Sign in</a>
+                <a class="nav-link" href="{{ route('shop.index') }}"><i class="bi bi-bag mr-1"></i> Shop</a>
+                <a class="nav-link" href="{{ route('cart.index') }}"><i class="bi bi-cart3 mr-1"></i> Cart</a>
+                @auth
+                    <a class="nav-link" href="{{ route('profile.show') }}"><i class="bi bi-person-circle mr-1"></i> {{ \Illuminate\Support\Str::limit(auth()->user()->name, 12) }}</a>
+                    @if (auth()->user()->is_admin)
+                        <a class="nav-link" href="{{ url('/admin/dashboard') }}"><i class="bi bi-speedometer mr-1"></i> Admin</a>
+                    @endif
+                    <form action="{{ route('logout') }}" method="POST" class="ml-3 mb-0 d-inline">
+                        @csrf
+                        <button class="btn btn-outline-dark" type="submit"><i class="bi bi-box-arrow-right mr-1"></i> Logout</button>
+                    </form>
+                @else
+                    <a class="ml-3 text-dark" href="{{ url('/register') }}"><i class="bi bi-person-plus mr-1"></i> Create account</a>
+                    <a class="btn btn-outline-dark ml-2" href="{{ url('/login') }}"><i class="bi bi-box-arrow-in-right mr-1"></i> Sign in</a>
+                @endauth
             </nav>
         </div>
     </header>
@@ -46,7 +55,7 @@
         <div class="container hero-inner text-center">
             <h2 class="mb-3">Nurture your daily wellness</h2>
             <p class="text-muted mb-4">Clean supplements, self-care essentials, and mindful routines — delivered.</p>
-            <a href="#" class="btn btn-wellness">Explore Products</a>
+            <a href="{{ route('shop.index') }}" class="btn btn-wellness">Explore Products</a>
         </div>
     </section>
 
