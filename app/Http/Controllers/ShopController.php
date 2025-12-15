@@ -3,17 +3,52 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ShopController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $products = Product::where('is_active', true)
-            ->orderBy('name')
-            ->paginate(12);
+        $categories = [
+            'all' => 'All',
+            'adaptogens' => 'Adaptogens',
+            'skincare' => 'Skincare',
+            'pantry' => 'Pantry',
+            'bath' => 'Bath',
+            'tools' => 'Tools',
+        ];
 
-        return view('shop.index', compact('products'));
+        $activeCategory = $request->query('category', 'all');
+        if (! array_key_exists($activeCategory, $categories)) {
+            $activeCategory = 'all';
+        }
+
+        $query = Product::where('is_active', true);
+
+        if ($activeCategory !== 'all') {
+            $query->where('category', $activeCategory);
+        }
+
+        $featuredProducts = (clone $query)
+            ->orderBy('name')
+            ->take(3)
+            ->get();
+
+        $products = (clone $query)
+            ->orderBy('name')
+            ->paginate(12)
+            ->withQueryString();
+
+        $cartCount = array_sum(session('cart', []));
+
+        return view('shop.index', [
+            'products' => $products,
+            'featuredProducts' => $featuredProducts,
+            'categories' => $categories,
+            'activeCategory' => $activeCategory,
+            'cartCount' => $cartCount,
+        ]);
     }
 
     public function show(Product $product): View

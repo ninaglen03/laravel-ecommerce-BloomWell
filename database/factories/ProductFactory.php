@@ -14,6 +14,7 @@ class ProductFactory extends Factory
         return [
             'name' => Str::title($name),
             'slug' => Str::slug($name) . '-' . fake()->unique()->lexify('???'),
+            'category' => fake()->randomElement(['adaptogens', 'skincare', 'pantry', 'bath', 'tools']),
             'summary' => fake()->sentence(),
             'description' => fake()->paragraph(3),
             'price' => fake()->randomFloat(2, 9, 120),

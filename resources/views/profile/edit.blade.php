@@ -1,13 +1,15 @@
 @extends('layouts.app')
 
 @section('title', 'Edit Profile')
+@section('page_kicker', 'Account hub')
+@section('page_title', 'Update profile')
+@section('page_subtitle', 'Refresh your info and keep communication flowing seamlessly.')
 
 @section('content')
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h4 class="card-title mb-3">Update profile</h4>
+        <div class="col-md-7">
+            <div class="profile-card">
+                <h5 class="mb-3">Update profile</h5>
 
                     @if ($errors->any())
                         <div class="alert alert-danger">

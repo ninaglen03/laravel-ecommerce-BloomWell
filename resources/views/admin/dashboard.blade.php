@@ -1,15 +1,18 @@
 @extends('layouts.app')
 
 @section('title', 'Admin Dashboard')
+@section('page_kicker', 'Store HQ')
+@section('page_title', 'Admin console')
+@section('page_subtitle', 'Monitor performance, resolve orders, and keep inventory lush and stocked.')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-toolbar">
         <div>
-            <h2 class="mb-1">Store health</h2>
+            <h3 class="mb-1">Store health</h3>
             <p class="text-muted mb-0">Snapshot of BloomWell performance.</p>
         </div>
-        <div>
-            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary mr-2">
+        <div class="actions">
+            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-forest">
                 <i class="bi bi-box-seam mr-1"></i> Manage products
             </a>
             <a href="{{ route('admin.orders.index') }}" class="btn btn-wellness">
@@ -18,38 +21,22 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Total revenue</p>
-                    <h3 class="mb-0">${{ number_format($metrics['revenue'], 2) }}</h3>
-                </div>
-            </div>
+    <div class="admin-grid">
+        <div class="admin-card">
+            <p class="text-uppercase small mb-1" style="letter-spacing:.2em;">Revenue</p>
+            <h3 class="mb-0">${{ number_format($metrics['revenue'], 2) }}</h3>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Orders placed</p>
-                    <h3 class="mb-0">{{ $metrics['orders'] }}</h3>
-                </div>
-            </div>
+        <div class="admin-card">
+            <p class="text-uppercase small mb-1" style="letter-spacing:.2em;">Orders</p>
+            <h3 class="mb-0">{{ $metrics['orders'] }}</h3>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Processing</p>
-                    <h3 class="mb-0">{{ $metrics['processing'] }}</h3>
-                </div>
-            </div>
+        <div class="admin-card">
+            <p class="text-uppercase small mb-1" style="letter-spacing:.2em;">Processing</p>
+            <h3 class="mb-0">{{ $metrics['processing'] }}</h3>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Fulfilled</p>
-                    <h3 class="mb-0">{{ $metrics['fulfilled'] }}</h3>
-                </div>
-            </div>
+        <div class="admin-card">
+            <p class="text-uppercase small mb-1" style="letter-spacing:.2em;">Fulfilled</p>
+            <h3 class="mb-0">{{ $metrics['fulfilled'] }}</h3>
         </div>
     </div>
 
@@ -64,8 +51,8 @@
                         </div>
                         <span class="badge badge-light">Today: ${{ number_format($metrics['today'], 2) }}</span>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-0">
+                    <div class="table-responsive table-shell">
+                        <table class="table table-sm table-styled mb-0">
                             <thead>
                             <tr>
                                 <th>#</th>
@@ -73,6 +60,7 @@
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th>Placed</th>
+                                <th class="text-right">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -81,8 +69,19 @@
                                     <td><a href="{{ route('admin.orders.show', $order) }}">#{{ $order->id }}</a></td>
                                     <td>{{ optional($order->user)->name ?? 'Guest' }}</td>
                                     <td>${{ number_format($order->total, 2) }}</td>
-                                    <td><span class="badge badge-pill badge-{{ $order->status === 'cancelled' ? 'secondary' : ($order->status === 'completed' ? 'success' : 'warning') }}">{{ $order->status_label }}</span></td>
+                                    <td>
+                                        <span class="badge badge-pill badge-{{ $order->status === 'cancelled' ? 'secondary' : ($order->status === 'completed' ? 'success' : 'warning') }}">{{ $order->status_label }}</span>
+                                    </td>
                                     <td>{{ optional($order->placed_at)->format('M d, h:i A') ?? '—' }}</td>
+                                    <td class="text-right">
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-secondary mr-1">View</a>
+                                        @if (! in_array($order->status, ['completed', 'cancelled']))
+                                            <form action="{{ route('admin.orders.fulfill', $order) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary btn-sm">Fulfill</button>
+                                            </form>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>

@@ -35,16 +35,20 @@
                         </select>
                         <button class="btn btn-wellness" type="submit">Update</button>
                     </form>
+                    @if (! in_array($order->status, ['completed', 'cancelled']))
+                        <form method="POST" action="{{ route('admin.orders.fulfill', $order) }}" class="d-inline-block mt-2">
+                            @csrf
+                            <button class="btn btn-primary btn-sm" type="submit">Mark as fulfilled</button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="mb-3">Items</h5>
-            <div class="table-responsive">
-                <table class="table">
+    <div class="table-shell">
+        <div class="table-responsive">
+            <table class="table table-styled mb-0">
                     <thead>
                     <tr>
                         <th>Product</th>

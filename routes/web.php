@@ -123,4 +123,5 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::resource('/admin/products', AdminProductController::class)->names('admin.products');
     Route::resource('/admin/orders', AdminOrderController::class)->only(['index', 'show', 'update'])->names('admin.orders');
+    Route::post('/admin/orders/{order}/fulfill', [AdminOrderController::class, 'fulfill'])->name('admin.orders.fulfill');
 });

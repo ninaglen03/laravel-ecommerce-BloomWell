@@ -67,4 +67,19 @@ class OrderController extends Controller
 
         return back()->with('status', 'Order status updated.');
     }
+
+    public function fulfill(Order $order): RedirectResponse
+    {
+        if ($order->status === 'cancelled') {
+            return back()->with('error', 'Cancelled orders cannot be fulfilled.');
+        }
+
+        if ($order->status === 'completed') {
+            return back()->with('status', 'Order already fulfilled.');
+        }
+
+        $order->update(['status' => 'completed']);
+
+        return back()->with('status', 'Order marked as fulfilled.');
+    }
 }

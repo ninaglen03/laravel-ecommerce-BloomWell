@@ -1,16 +1,21 @@
 @extends('layouts.app')
 
 @section('title', 'Orders - Admin')
+@section('page_kicker', 'Admin ops')
+@section('page_title', 'Order queue')
+@section('page_subtitle', 'Filter, fulfill, and keep customer deliveries flowing smoothly.')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="page-toolbar">
         <div>
             <h3 class="mb-0">Orders</h3>
             <p class="text-muted mb-0">Track and manage every purchase.</p>
         </div>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-speedometer2 mr-1"></i> Dashboard
-        </a>
+        <div class="actions">
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-forest">
+                <i class="bi bi-speedometer2 mr-1"></i> Dashboard
+            </a>
+        </div>
     </div>
 
     <form method="GET" class="card card-body mb-4">
@@ -34,8 +39,8 @@
         </div>
     </form>
 
-    <div class="table-responsive">
-        <table class="table table-striped">
+    <div class="table-responsive table-shell">
+        <table class="table table-styled">
             <thead>
             <tr>
                 <th>#</th>
@@ -59,6 +64,12 @@
                     <td>{{ optional($order->placed_at)->format('M d, Y h:i A') ?? '—' }}</td>
                     <td class="text-right">
                         <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary">View</a>
+                        @if (! in_array($order->status, ['completed', 'cancelled']))
+                            <form action="{{ route('admin.orders.fulfill', $order) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-primary btn-sm ml-1">Fulfill</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
             @empty
@@ -70,5 +81,7 @@
         </table>
     </div>
 
-    {{ $orders->links() }}
+    <div class="mt-4">
+        {{ $orders->links('components.pagination') }}
+    </div>
 @endsection

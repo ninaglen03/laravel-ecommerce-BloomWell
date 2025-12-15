@@ -1,27 +1,42 @@
 @extends('layouts.app')
 
 @section('title', 'Order #' . $order->id)
+@section('page_kicker', 'Order detail')
+@section('page_title', 'Order #' . $order->id)
+@section('page_subtitle', optional($order->placed_at)->format('M d, Y \a\t h:i A') ?? 'Awaiting placement')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="page-toolbar">
         <div>
-            <h3 class="mb-0">Order #{{ $order->id }}</h3>
-            <p class="text-muted mb-0">Placed {{ optional($order->placed_at)->format('M d, Y \a\t h:i A') ?? 'n/a' }}</p>
+            <h3 class="mb-0">Order status</h3>
+            <p class="text-muted mb-0">Track progress and review line items.</p>
         </div>
-        <a href="{{ route('orders.index') }}" class="btn btn-outline-secondary">Back to orders</a>
+        <div class="actions">
+            <a href="{{ route('orders.index') }}" class="btn btn-outline-forest">Back to orders</a>
+        </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-                <p class="mb-1"><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
-                <p class="mb-0"><strong>Total:</strong> ${{ number_format($order->total, 2) }}</p>
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="text-muted mb-1">Status</p>
+                    <h5 class="mb-0">{{ ucfirst($order->status) }}</h5>
+                </div>
+                <div class="col-md-4">
+                    <p class="text-muted mb-1">Total</p>
+                    <h5 class="mb-0">${{ number_format($order->total, 2) }}</h5>
+                </div>
+                <div class="col-md-4">
+                    <p class="text-muted mb-1">Destination</p>
+                    <h5 class="mb-0">{{ optional($order->shipping_address)['city'] ?? 'On file' }}</h5>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table">
+    <div class="table-responsive table-shell">
+        <table class="table table-styled mb-0">
             <thead>
             <tr>
                 <th>Product</th>

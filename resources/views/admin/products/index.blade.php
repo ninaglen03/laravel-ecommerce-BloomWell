@@ -5,22 +5,27 @@
 @section('suppress-status', true)
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="page-toolbar">
         <div>
-            <h3 class="mb-0">Products</h3>
-            <p class="text-muted">Manage the catalog visible to shoppers.</p>
+            <h3 class="mb-0">Product catalog</h3>
+            <p class="text-muted mb-0">Manage the assortment customers see in the shop.</p>
         </div>
-        <a href="{{ route('admin.products.create') }}" class="btn btn-wellness">
-            <i class="bi bi-plus-circle mr-1"></i> Add product
-        </a>
+        <div class="actions">
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-forest">
+                <i class="bi bi-speedometer2 mr-1"></i> Dashboard
+            </a>
+            <a href="{{ route('admin.products.create') }}" class="btn btn-wellness">
+                <i class="bi bi-plus-circle mr-1"></i> Add product
+            </a>
+        </div>
     </div>
 
     @if (session('status'))
         <div class="alert alert-success flash-alert" role="alert">{{ session('status') }}</div>
     @endif
 
-    <div class="table-responsive">
-        <table class="table table-striped">
+    <div class="table-responsive table-shell">
+        <table class="table table-styled">
             <thead>
             <tr>
                 <th>Name</th>
@@ -61,5 +66,7 @@
         </table>
     </div>
 
-    {{ $products->links() }}
+    <div class="mt-4">
+        {{ $products->links('components.pagination') }}
+    </div>
 @endsection

@@ -3,10 +3,26 @@
 @section('title', 'Sign in - BloomWell')
 
 @section('content')
-    <div class="card card-auth">
-        <div class="card-body">
-            <h4 class="card-title text-center">Welcome back</h4>
-            <p class="text-center text-muted">Sign in to manage your wellness orders, subscriptions, and rewards.</p>
+    @section('page_kicker', 'Member access')
+    @section('page_title', 'Welcome back')
+    @section('page_subtitle', 'Sign in to track orders, manage rituals, and keep BloomWell rewards in sync with your routine.')
+
+    <div class="auth-shell">
+        <aside class="auth-visual">
+            <span class="auth-badge">Bloom Club</span>
+            <div>
+                <h3>Rituals stay in rhythm</h3>
+                <p>Sync autoship refills, get personalized herbal notes, and access concierge chat when you need a wellness tune-up.</p>
+            </div>
+            <ul class="auth-benefits">
+                <li><i class="bi bi-check2-circle"></i> Pause or edit deliveries anytime</li>
+                <li><i class="bi bi-check2-circle"></i> Save curated routines</li>
+                <li><i class="bi bi-check2-circle"></i> Earn double points on rituals</li>
+            </ul>
+        </aside>
+        <div class="auth-panel">
+            <h4 class="card-title mb-3">Sign in</h4>
+            <p class="text-muted mb-4">Use the email tied to your BloomWell account.</p>
 
             @if (session('status'))
                 <div class="alert alert-info">{{ session('status') }}</div>
@@ -37,11 +53,12 @@
                     <label class="form-check-label" for="remember">Remember me</label>
                 </div>
 
-                <button type="submit" class="btn btn-block btn-wellness">Sign in</button>
+                <button type="submit" class="btn btn-wellness">Sign in</button>
             </form>
 
             <hr>
-            <p class="text-center">New to BloomWell? <a href="{{ url('/register') }}">Create an account</a></p>
+            <p class="text-center mb-0">New to BloomWell?</p>
+            <p class="text-center"><a href="{{ url('/register') }}" class="btn btn-link">Create an account</a></p>
         </div>
     </div>
 @endsection
