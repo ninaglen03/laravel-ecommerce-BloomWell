@@ -17,6 +17,10 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'must_change_password',
+        'admin_requested_at',
+        'admin_approved_at',
+        'admin_denied_at',
     ];
 
     protected $hidden = [
@@ -30,6 +34,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'must_change_password' => 'boolean',
+            'admin_requested_at' => 'datetime',
+            'admin_approved_at' => 'datetime',
+            'admin_denied_at' => 'datetime',
         ];
     }
 

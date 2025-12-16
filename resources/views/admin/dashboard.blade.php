@@ -21,6 +21,16 @@
         </div>
     </div>
 
+    @if (($pendingAdminRequests ?? 0) > 0)
+        <div class="alert alert-warning d-flex align-items-center justify-content-between shadow-sm">
+            <div>
+                <strong>{{ $pendingAdminRequests }} admin access request{{ $pendingAdminRequests === 1 ? '' : 's' }}</strong> awaiting review.
+                <span class="text-muted">Approve to unlock console access.</span>
+            </div>
+            <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-forest btn-sm">Review requests</a>
+        </div>
+    @endif
+
     <div class="admin-grid">
         <div class="admin-card">
             <p class="text-uppercase small mb-1" style="letter-spacing:.2em;">Revenue</p>

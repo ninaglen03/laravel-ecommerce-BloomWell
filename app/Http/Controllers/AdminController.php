@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -38,6 +39,10 @@ class AdminController extends Controller
             ->limit(5)
             ->get();
 
-        return view('admin.dashboard', compact('metrics', 'recentOrders', 'lowInventory', 'topProducts'));
+        $pendingAdminRequests = User::whereNotNull('admin_requested_at')
+            ->where('is_admin', false)
+            ->count();
+
+        return view('admin.dashboard', compact('metrics', 'recentOrders', 'lowInventory', 'topProducts', 'pendingAdminRequests'));
     }
 }

@@ -9,3 +9,146 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+:root {
+    --ease-fluid: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+    --card-lift: translateY(-8px) scale(1.01);
+}
+
+@keyframes fade-sequence {
+    from {
+        opacity: 0;
+        transform: translateY(var(--fade-distance, 28px));
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes glow-pan {
+    0% {
+        transform: translateX(-120%);
+    }
+    100% {
+        transform: translateX(120%);
+    }
+}
+
+@keyframes ambient-float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.fade-seq {
+    opacity: 0;
+    transform: translateY(var(--fade-distance, 28px));
+    animation: fade-sequence 0.95s var(--ease-fluid) forwards;
+    animation-delay: var(--fade-delay, 0s);
+}
+
+.card-ambient {
+    position: relative;
+    transition: transform 0.55s var(--ease-snap), box-shadow 0.55s var(--ease-fluid), filter 0.55s var(--ease-fluid);
+}
+
+.card-ambient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3), transparent 55%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s var(--ease-fluid);
+}
+
+.card-ambient:hover,
+.card-ambient:focus-visible {
+    transform: var(--card-lift);
+    box-shadow: 0 20px 45px rgba(6, 29, 22, 0.18);
+}
+
+.card-ambient:hover::after,
+.card-ambient:focus-visible::after {
+    opacity: 1;
+}
+
+.btn-kinetic {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s var(--ease-snap), box-shadow 0.35s var(--ease-snap);
+    will-change: transform;
+}
+
+.btn-kinetic::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.4) 45%, transparent 90%);
+    transform: translateX(-120%);
+    transition: transform 0.65s var(--ease-snap);
+}
+
+.btn-kinetic:hover,
+.btn-kinetic:focus-visible {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 25px rgba(7, 36, 27, 0.2);
+}
+
+.btn-kinetic:hover::after,
+.btn-kinetic:focus-visible::after {
+    transform: translateX(120%);
+}
+
+.metric-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    inset: auto 10% -110% 10%;
+    height: 140%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.25), transparent);
+    animation: ambient-float 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.feature-pill,
+.collection-card,
+.ritual-card,
+.testimonial-cta {
+    transition: transform 0.6s var(--ease-snap), box-shadow 0.6s var(--ease-snap);
+}
+
+.feature-pill:hover,
+.collection-card:hover,
+.ritual-card:hover,
+.testimonial-cta:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 35px rgba(6, 18, 14, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fade-seq,
+    .card-ambient,
+    .btn-kinetic,
+    .feature-pill,
+    .collection-card,
+    .ritual-card,
+    .testimonial-cta {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
+}

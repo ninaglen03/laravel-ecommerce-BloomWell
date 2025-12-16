@@ -59,6 +59,21 @@
         background:rgba(58,127,92,.12);
         color:var(--fern) !important;
     }
+    .nav-pill-alert {
+        background:rgba(209,68,68,.08);
+        border:1px solid rgba(209,68,68,.25);
+        color:#b93131 !important;
+        font-weight:600;
+    }
+    .nav-pill-alert:hover,
+    .nav-pill-alert:focus {
+        background:rgba(209,68,68,.16) !important;
+        border-color:rgba(209,68,68,.45);
+        color:#a22626 !important;
+    }
+    .nav-pill-alert .badge {
+        background:#b93131;
+    }
     .nav-account-toggle {
         color:var(--forest);
         font-weight:600;
@@ -731,6 +746,10 @@
         overflow:hidden;
         background:#fff;
     }
+    .auth-shell.admin-mode {
+        background:linear-gradient(135deg, rgba(8,25,46,0.08), rgba(31,77,58,0.08));
+        border:1px solid rgba(13,36,52,.08);
+    }
     .auth-visual {
         background:linear-gradient(135deg, #173628, #2f6a4b 60%, #6da08a);
         color:#fff;
@@ -741,6 +760,9 @@
         justify-content:space-between;
         min-height:100%;
         overflow:hidden;
+    }
+    .auth-shell.admin-mode .auth-visual {
+        background:linear-gradient(135deg, #0d2238, #134c8a 55%, #2f7ab2);
     }
     .auth-visual::before,
     .auth-visual::after {
@@ -798,9 +820,26 @@
         font-size:.78rem;
         box-shadow:0 8px 25px rgba(0,0,0,.15);
     }
+    .auth-badge.admin { background:rgba(13,36,52,.45); }
+    .admin-metric-grid {
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:.75rem;
+        margin:1.5rem 0;
+    }
+    .admin-metric-grid .metric-value {
+        display:block;
+        font-size:1.4rem;
+        font-weight:700;
+    }
+    .admin-metric-grid small { color:rgba(255,255,255,.75); text-transform:uppercase; letter-spacing:.15em; font-size:.7rem; }
     .auth-panel {
         padding:2.75rem;
         background:#fff;
+    }
+    .auth-panel.admin-panel {
+        background:#fdfcf7;
+        border-left:4px solid rgba(13,36,52,.2);
     }
     .auth-panel h4 {
         font-family:'Fraunces', 'Work Sans', serif;
@@ -897,7 +936,17 @@
                     <a class="nav-link nav-pill" href="{{ route('shop.index') }}"><i class="bi bi-bag mr-1"></i> Shop</a>
                     <a class="nav-link nav-pill" href="{{ route('cart.index') }}"><i class="bi bi-cart3 mr-1"></i> Cart</a>
                 @else
-                    <a class="nav-link nav-pill" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2 mr-1"></i> Admin Console</a>
+                    <div class="d-flex align-items-center">
+                        <a class="nav-link nav-pill" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2 mr-1"></i> Admin Console</a>
+                        @php($pendingAdminRequestsNav = $navbarPendingAdminRequests ?? 0)
+                        @if ($pendingAdminRequestsNav > 0)
+                            <a class="nav-link nav-pill nav-pill-alert ml-2 d-flex align-items-center" href="{{ route('admin.requests.index') }}">
+                                <i class="bi bi-inbox-fill mr-1"></i>
+                                <span>Requests</span>
+                                <span class="badge badge-pill ml-2">{{ $pendingAdminRequestsNav }}</span>
+                            </a>
+                        @endif
+                    </div>
                 @endif
                 @auth
                     <div class="dropdown ml-3">

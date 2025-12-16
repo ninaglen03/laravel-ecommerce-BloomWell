@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\AdminAccessRequestController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\CartController;
@@ -61,6 +62,10 @@ Route::post('/login', function (Request $request) {
         return redirect()->intended('/admin/dashboard');
     }
 
+    if ($user && $user->admin_requested_at) {
+        return redirect()->route('admin.requests.pending');
+    }
+
     return redirect()->intended(route('shop.index'));
 });
 
@@ -70,13 +75,16 @@ Route::get('/register', function () {
 
 Route::post('/register', function (Request $request) {
     $data = $request->only(['name', 'email', 'password', 'password_confirmation', 'store_admin']);
+    $isAdminRequest = $request->boolean('store_admin');
 
-    $validator = Validator::make($data, [
+    $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
-        'password' => 'required|min:6|confirmed',
+        'password' => 'required|min:8|confirmed',
         'store_admin' => 'nullable|boolean',
-    ]);
+    ];
+
+    $validator = Validator::make($data, $rules);
 
     if ($validator->fails()) {
         return redirect('/register')->withErrors($validator)->withInput();
@@ -86,17 +94,37 @@ Route::post('/register', function (Request $request) {
         'name' => $data['name'],
         'email' => $data['email'],
         'password' => Hash::make($data['password']),
-        'is_admin' => $request->boolean('store_admin'),
+        'is_admin' => false,
+        'must_change_password' => false,
+        'admin_requested_at' => $isAdminRequest ? now() : null,
+        'admin_approved_at' => null,
+        'admin_denied_at' => null,
     ]);
 
     Auth::login($user);
+    $request->session()->regenerate();
 
-    if ($user->is_admin) {
-        return redirect()->intended('/admin/dashboard');
+    if ($isAdminRequest) {
+        return redirect()->route('admin.requests.pending')
+            ->with('status', 'Your BloomWell HQ access request is pending review. The admin console unlocks once approved.');
     }
 
     return redirect()->intended(route('shop.index'));
 });
+
+Route::middleware('auth')->get('/admin/request/pending', function () {
+    $user = auth()->user();
+
+    if (! $user) {
+        return redirect()->route('login');
+    }
+
+    if ($user->is_admin || ! $user->admin_requested_at) {
+        return redirect()->route($user->is_admin ? 'admin.dashboard' : 'shop.index');
+    }
+
+    return view('admin.requests.pending');
+})->name('admin.requests.pending');
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
@@ -121,6 +149,9 @@ Route::middleware(['auth', 'customer'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/requests', [AdminAccessRequestController::class, 'index'])->name('admin.requests.index');
+    Route::post('/admin/requests/{user}/approve', [AdminAccessRequestController::class, 'approve'])->name('admin.requests.approve');
+    Route::post('/admin/requests/{user}/deny', [AdminAccessRequestController::class, 'deny'])->name('admin.requests.deny');
     Route::resource('/admin/products', AdminProductController::class)->names('admin.products');
     Route::resource('/admin/orders', AdminOrderController::class)->only(['index', 'show', 'update'])->names('admin.orders');
     Route::post('/admin/orders/{order}/fulfill', [AdminOrderController::class, 'fulfill'])->name('admin.orders.fulfill');
